@@ -5,8 +5,8 @@ import { env } from './config/env.js';
 async function bootstrap() {
   await connectDatabase();
 
-  const server = createApp().listen(env.PORT, () => {
-    console.log(`API listening on http://localhost:${env.PORT} (${env.NODE_ENV})`);
+  const server = createApp().listen(env.PORT, env.HOST, () => {
+    console.log(`API listening on http://${env.HOST}:${env.PORT} (${env.NODE_ENV})`);
   });
 
   const shutdown = (signal: string) => {

@@ -45,6 +45,7 @@ npm run dev                     # http://localhost:5000
 |---|---|---|
 | `NODE_ENV` | `development` / `production` | `development` |
 | `PORT` | HTTP port | `5000` |
+| `HOST` | Interface to bind (`127.0.0.1` behind nginx) | `0.0.0.0` |
 | `MONGODB_URI` | MongoDB connection string | — (required) |
 | `JWT_SECRET` | Token signing secret, ≥ 32 chars (`openssl rand -hex 32`) | — (required) |
 | `JWT_EXPIRES_IN_HOURS` | Session lifetime (JWT and cookie) | `24` |

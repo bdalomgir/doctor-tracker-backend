@@ -8,6 +8,8 @@ import { z } from 'zod';
 const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
   PORT: z.coerce.number().int().positive().default(5000),
+  // 127.0.0.1 when a reverse proxy (nginx) is the only public entry point.
+  HOST: z.string().default('0.0.0.0'),
   MONGODB_URI: z.string().min(1, 'MONGODB_URI is required'),
   JWT_SECRET: z.string().min(32, 'JWT_SECRET must be at least 32 characters'),
   JWT_EXPIRES_IN_HOURS: z.coerce.number().int().positive().default(24),
