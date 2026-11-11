@@ -5,9 +5,9 @@
 
 | | |
 |---|---|
-| **Live API** | <BACKEND_LIVE_URL> (health check: `/health`) |
-| **API docs (Swagger)** | <BACKEND_LIVE_URL>/api-docs |
-| **Live app** | <FRONTEND_LIVE_URL> |
+| **Live API** | [https://doctor-tracker-backend.alomgir.me](https://doctor-tracker-backend.alomgir.me/health) (health check: `/health`) |
+| **API docs (Swagger)** | [https://doctor-tracker-backend.alomgir.me/api-docs](https://doctor-tracker-backend.alomgir.me/api-docs) |
+| **Live app** | [doctor-tracker-frontend-ivory-zeta.vercel.app](https://doctor-tracker-frontend-ivory-zeta.vercel.app) |
 | **Demo login** | `admin@doctortracker.com` / `Admin@12345` |
 
 ## Description
@@ -49,7 +49,7 @@ npm run dev                     # http://localhost:5000
 | `MONGODB_URI` | MongoDB connection string | — (required) |
 | `JWT_SECRET` | Token signing secret, ≥ 32 chars (`openssl rand -hex 32`) | — (required) |
 | `JWT_EXPIRES_IN_HOURS` | Session lifetime (JWT and cookie) | `24` |
-| `CORS_ORIGINS` | Comma-separated allowed origins | `http://localhost:3000` |
+| `CORS_ORIGINS` | Comma-separated origins allowed to call the API from a browser (the web app's URL) | `http://localhost:3000` |
 | `SEED_ADMIN_NAME` / `_EMAIL` / `_PASSWORD` | Admin created by `npm run seed` | `Admin` / `admin@doctortracker.com` / `Admin@12345` |
 
 Environment variables are validated with Zod at boot; the process exits with a clear message if any is missing or invalid.
@@ -63,15 +63,20 @@ Environment variables are validated with Zod at boot; the process exits with a c
 | `npm run seed [-- --demo]` | Sync indexes, create admin, optionally load demo data |
 | `npm run lint` · `npm run typecheck` · `npm run format` | ESLint · TypeScript · Prettier |
 
-### Deploying to Render
+### Deployment
 
-`render.yaml` is included. Create a **Blueprint** (or a Web Service with build `npm ci --include=dev && npm run build` and start `npm start`) and set `MONGODB_URI` (Atlas) and `CORS_ORIGINS` (frontend URL). Seed the production database once from your machine:
+The live API runs on an Ubuntu VPS:
 
-```bash
-MONGODB_URI="<atlas-uri>" npm run seed -- --demo
+```
+Internet ─► nginx (TLS via Let's Encrypt) ─► PM2: node dist/server.js on 127.0.0.1:5100 ─► MongoDB 8 (127.0.0.1, auth enabled)
 ```
 
-Free instances sleep after inactivity, so the first request after a pause can take ~50 s.
+- The app binds to `127.0.0.1` (`HOST`), so it is reachable only through nginx over HTTPS.
+- MongoDB listens on localhost only, requires authentication, and the app uses a user limited to the `doctor-tracker` database.
+- `CORS_ORIGINS` is set to the web app (`https://doctor-tracker-frontend-ivory-zeta.vercel.app`). The app itself calls the API through its own `/api` proxy, so CORS only matters for direct browser calls.
+- Updating: `git pull && npm ci && npm run build && pm2 reload doctor-tracker-api`.
+
+**Alternative: Render.** `render.yaml` is included. Create a Blueprint (build `npm ci --include=dev && npm run build`, start `npm start`), set `MONGODB_URI` (e.g. MongoDB Atlas) and `CORS_ORIGINS`, then seed once with `MONGODB_URI="<uri>" npm run seed -- --demo`.
 
 ## API reference
 
